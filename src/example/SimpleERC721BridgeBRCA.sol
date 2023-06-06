@@ -68,7 +68,8 @@ contract SimpleERC721BridgeBRCA is ERC721BridgeBRCTokenMapping, ERC721A {
             return
                 string(
                     abi.encodePacked(
-                        ERC721A.tokenURI(originalTokenId(tokenId)),
+                        _baseMetadataURI,
+                        _toString(originalTokenId(tokenId)),
                         _BASE_EXTENSION
                     )
                 );
@@ -76,7 +77,7 @@ contract SimpleERC721BridgeBRCA is ERC721BridgeBRCTokenMapping, ERC721A {
     }
 
     function _startTokenId() internal pure override returns (uint256) {
-        return 1;
+        return _startId() + 1;
     }
 
     function setTokenMetadataURI(
