@@ -3,7 +3,7 @@ pragma solidity >=0.8.17;
 
 import {ERC721BridgeBRC} from "./ERC721BridgeBRC.sol";
 
-contract ERC721BridgeBRCTokenURI is ERC721BridgeBRC {
+contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
     mapping(uint256 => uint256) private originalNFTTokenId;
     uint256 public registCount = _startTokenId();
 
@@ -18,9 +18,6 @@ contract ERC721BridgeBRCTokenURI is ERC721BridgeBRC {
         originalNFTTokenId[tokenId] = _originalTokenId;
     }
 
-    /**
-     * @dev Returns `true` if this contract has original NFT. Regist Original contract to call this function.
-     */
     function originalTokenId(
         uint256 tokenId
     ) public view virtual returns (uint256) {

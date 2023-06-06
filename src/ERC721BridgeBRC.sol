@@ -26,6 +26,10 @@ contract ERC721BridgeBRC is IERC721Receiver {
     function hasOriginalNFT(
         uint256 originalTokenId
     ) public view virtual returns (bool) {
+        require(
+            OriginalContract != address(0),
+            "OriginalContract address is 0"
+        );
         return
             IERC721(OriginalContract).ownerOf(originalTokenId) == address(this);
     }

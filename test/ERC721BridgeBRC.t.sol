@@ -52,4 +52,31 @@ contract ERC721BridgeBRCTest is Test {
         vm.expectRevert("token transfer need operator role");
         original.safeTransferFrom(alis, address(nft), 3);
     }
+
+    function testMintTokenId() public {
+        original.mint(bob, 3);
+        original.mint(bob, 4);
+        original.mint(alis, 5);
+        original.mint(bob, 6);
+        nft.grantOperator(bob);
+
+        vm.startPrank(bob);
+        original.safeTransferFrom(bob, address(nft), 4);
+        original.safeTransferFrom(bob, address(nft), 3);
+        nft.mint(bob, 1);
+        nft.mint(bob, 2);
+        assertEq(nft.originalTokenId(1), 4);
+        assertEq(nft.originalTokenId(2), 3);
+
+        // transferFrom don't count
+        vm.startPrank(alis);
+        original.transferFrom(alis, address(nft), 5);
+        nft.mint(alis, 3);
+        assertEq(nft.originalTokenId(3), 0);
+
+        // Ignore alis transfer
+        vm.startPrank(bob);
+        original.safeTransferFrom(bob, address(nft), 6);
+        assertEq(nft.originalTokenId(3), 6);
+    }
 }
