@@ -5,9 +5,9 @@ import {ERC721BridgeBRC} from "./ERC721BridgeBRC.sol";
 
 contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
     mapping(uint256 => uint256) private originalNFTTokenId;
-    uint256 public registCount = _startTokenId();
+    uint256 public registCount = _startId();
 
-    function _startTokenId() internal pure virtual returns (uint256) {
+    function _startId() internal pure virtual returns (uint256) {
         return 1;
     }
 

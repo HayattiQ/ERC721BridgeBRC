@@ -13,11 +13,16 @@ contract ERC721BridgeBRC is IERC721Receiver {
         uint256 tokenId
     );
 
-    address public OriginalContract;
+    address public originalContract;
+    address public bridgeContract;
     mapping(address => bool) private _operator;
 
     function _registOriginalContractAddress(address _contract) internal {
-        OriginalContract = _contract;
+        originalContract = _contract;
+    }
+
+    function _registBridgeContractAddress(address _contract) internal {
+        bridgeContract = _contract;
     }
 
     /**
@@ -27,11 +32,11 @@ contract ERC721BridgeBRC is IERC721Receiver {
         uint256 originalTokenId
     ) public view virtual returns (bool) {
         require(
-            OriginalContract != address(0),
+            originalContract != address(0),
             "OriginalContract address is 0"
         );
         return
-            IERC721(OriginalContract).ownerOf(originalTokenId) == address(this);
+            IERC721(originalContract).ownerOf(originalTokenId) == address(this);
     }
 
     function _grantOperator(address account) internal virtual {
