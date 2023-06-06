@@ -21,6 +21,11 @@ contract SimpleERC721BridgeBRCA is ERC721BridgeBRCTokenMapping, ERC721A {
 
     constructor(address _original) ERC721A("MockBTC", "MOCKBTC") {
         _registOriginalContractAddress(_original);
+
+        // BRC-721E Bridge Contract Address
+        _registBridgeContractAddress(
+            0x000000000000000000000000000000000000dEaD
+        );
     }
 
     function mint(address to, uint256 amount) external virtual {
@@ -32,6 +37,10 @@ contract SimpleERC721BridgeBRCA is ERC721BridgeBRCTokenMapping, ERC721A {
         uint256 tokenId,
         string memory _btcAddress
     ) external virtual {
+        require(
+            bridgeContract != address(0),
+            "Bridge Contract is Zero Address"
+        );
         ERC721A.safeTransferFrom(
             from,
             bridgeContract,

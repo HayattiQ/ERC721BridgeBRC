@@ -29,6 +29,7 @@ contract ERC721BridgeBRCTest is Test {
             memory _hex = hex"62633170647168737463706b6674653568336b36736678756837743573347968786d7a6e656474336b666468747767336836337835673873666c7774716d";
         assertEq(bytes(_btcAddress), _hex);
 
+        // non approval transfer prohibit
         nftA.mint(bob, 1);
         vm.expectRevert(IERC721A.TransferCallerNotOwnerNorApproved.selector);
         nftA.bridge(
@@ -36,7 +37,24 @@ contract ERC721BridgeBRCTest is Test {
             1,
             "bc1pdqhstcpkfte5h3k6sfxuh7t5s4yhxmznedt3kfdhtwg3h63x5g8sflwtqm"
         );
-        nftA.setApprovalForAll(bob, true);
+
+        // other owner approve is prohibit
+        nftA.setApprovalForAll(address(nftA), true);
+        vm.expectRevert(IERC721A.TransferCallerNotOwnerNorApproved.selector);
+        nftA.bridge(
+            bob,
+            1,
+            "bc1pdqhstcpkfte5h3k6sfxuh7t5s4yhxmznedt3kfdhtwg3h63x5g8sflwtqm"
+        );
+
+        // setApprove
+        vm.startPrank(bob);
+        nftA.setApprovalForAll(address(nftA), true);
+        nftA.bridge(
+            bob,
+            1,
+            "bc1pdqhstcpkfte5h3k6sfxuh7t5s4yhxmznedt3kfdhtwg3h63x5g8sflwtqm"
+        );
     }
 
     function testERC721ATokenURI() public {
