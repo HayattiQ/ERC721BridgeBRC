@@ -8,7 +8,7 @@ contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
     uint256 public registCount = _startId();
 
     function _startId() internal pure virtual returns (uint256) {
-        return 1;
+        return 0;
     }
 
     function _updateMapping(
@@ -30,8 +30,8 @@ contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
         uint256 tokenId,
         bytes memory data
     ) public virtual override returns (bytes4) {
-        originalNFTTokenId[registCount] = tokenId;
         registCount++;
+        originalNFTTokenId[registCount] = tokenId;
         return super.onERC721Received(operator, from, tokenId, data);
     }
 }

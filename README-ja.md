@@ -14,7 +14,6 @@ ERC721BridgeBRC は、これらの問題を解決し、 イーサリアム上で
 
 ## Idea
 
-
 ## Operation
 
 ### ERC721BridgeBTC のコントラクトをイーサリアムにてデプロイ
