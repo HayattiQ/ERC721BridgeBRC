@@ -10,14 +10,14 @@ contract ERC721BridgeBRCTest is Test {
     MockERC721 public original;
     SimpleERC721BridgeBRCA public nftA;
 
-    address public bob;
-    address public alis;
+    address public bob = makeAddr("bob");
+    address public alis = makeAddr("alis");
+    address public charlie = makeAddr("charlie");
 
     function setUp() public {
-        bob = makeAddr("bob");
         vm.deal(bob, 1 ether);
-        alis = makeAddr("alis");
         vm.deal(alis, 1 ether);
+        vm.deal(charlie, 1 ether);
         original = new MockERC721();
         nftA = new SimpleERC721BridgeBRCA(address(original));
     }
@@ -133,5 +133,69 @@ contract ERC721BridgeBRCTest is Test {
 
         vm.expectRevert("This token has not minted");
         nftA.tokenURI(5);
+    }
+
+    function testERC721ATokenURITransferMethod() public {
+        original.mint(bob, 1);
+        original.mint(alis, 2);
+        original.mint(bob, 3);
+        original.mint(alis, 4);
+        original.mint(bob, 5);
+        original.mint(alis, 6);
+        original.mint(bob, 7);
+        original.mint(alis, 8);
+
+        nftA.grantOperator(bob);
+        nftA.setBaseURI("ar://predefine/");
+
+        // transfer can only bob
+        vm.prank(bob);
+        original.safeTransferFrom(bob, address(nftA), 3);
+        vm.expectRevert("ERC721: caller is not token owner or approved");
+        original.safeTransferFrom(alis, address(nftA), 4);
+        vm.prank(alis);
+        vm.expectRevert("token transfer need operator role");
+        original.safeTransferFrom(alis, address(nftA), 4);
+
+        // transfer method (does'nt affect tokenId)
+        vm.prank(bob);
+        original.transferFrom(bob, address(nftA), 5);
+        vm.prank(alis);
+        original.transferFrom(alis, address(nftA), 6);
+
+        // approved transfer
+        vm.prank(bob);
+        original.approve(charlie, 7);
+        vm.prank(alis);
+        original.setApprovalForAll(charlie, true);
+        vm.prank(charlie);
+        vm.expectRevert("token transfer need operator role");
+        original.safeTransferFrom(bob, address(nftA), 7);
+        vm.prank(charlie);
+        vm.expectRevert("token transfer need operator role");
+        original.safeTransferFrom(alis, address(nftA), 8);
+
+        // brc mint
+        nftA.mint(bob, 8);
+        assertEq(nftA.originalTokenId(1), 3);
+        assertEq(nftA.originalTokenId(2), 0);
+        assertEq(nftA.originalTokenId(3), 0);
+        assertEq(nftA.originalTokenId(4), 0);
+        assertEq(nftA.originalTokenId(5), 0);
+        assertEq(nftA.originalTokenId(6), 0);
+        assertEq(nftA.originalTokenId(7), 0);
+        assertEq(nftA.originalTokenId(8), 0);
+        assertEq(nftA.originalTokenId(9), 0);
+
+        assertEq(nftA.tokenURI(1), "ar://predefine/3.json");
+        assertEq(nftA.tokenURI(2), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(3), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(4), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(5), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(6), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(7), "ar://predefine/0.json");
+        assertEq(nftA.tokenURI(8), "ar://predefine/0.json");
+        vm.expectRevert("This token has not minted");
+        nftA.tokenURI(9);
     }
 }
