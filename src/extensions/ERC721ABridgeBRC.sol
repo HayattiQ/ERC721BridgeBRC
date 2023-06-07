@@ -78,10 +78,4 @@ contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
         _baseMetadataURI = metadata;
         emit BatchMetadataUpdate(_startId(), registCount);
     }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return ERC721A.supportsInterface(interfaceId);
-    }
 }
