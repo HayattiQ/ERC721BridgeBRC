@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import {SimpleERC721BridgeBRCA, ERC721A} from "../src/example/SimpleERC721BridgeBRCA.sol";
+import {SimpleERC721BridgeBRCA} from "../src/example/SimpleERC721BridgeBRCA.sol";
 import {MockERC721} from "../src/mocks/MockERC721.sol";
 import {IERC721A} from "ERC721A/IERC721A.sol";
 
@@ -30,7 +30,7 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(bytes(_nftAAddress), _hex);
 
         // non approval transfer prohibit
-        nftA.mint(bob, 1);
+        nftA.mint(bob, 5);
         vm.expectRevert(IERC721A.TransferCallerNotOwnerNorApproved.selector);
         nftA.bridge(
             bob,
@@ -53,6 +53,11 @@ contract ERC721BridgeBRCTest is Test {
         nftA.bridge(
             bob,
             1,
+            "bc1pdqhstcpkfte5h3k6sfxuh7t5s4yhxmznedt3kfdhtwg3h63x5g8sflwtqm"
+        );
+        nftA.bridge(
+            bob,
+            5,
             "bc1pdqhstcpkfte5h3k6sfxuh7t5s4yhxmznedt3kfdhtwg3h63x5g8sflwtqm"
         );
     }
