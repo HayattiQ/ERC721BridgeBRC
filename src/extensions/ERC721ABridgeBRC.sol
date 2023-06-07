@@ -74,6 +74,10 @@ contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
         emit MetadataUpdate(tokenId);
     }
 
+    function _emergencyWithdraw(address to, uint256 tokenId) internal virtual {
+        ERC721A(originalContract).safeTransferFrom(address(this), to, tokenId);
+    }
+
     function _setBaseURI(string memory metadata) internal virtual {
         _baseMetadataURI = metadata;
         emit BatchMetadataUpdate(_startId(), registCount);

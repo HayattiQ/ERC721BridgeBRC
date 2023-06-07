@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import {SimpleERC721BridgeBRCA} from "../src/example/SimpleERC721BridgeBRCA.sol";
+import {SimpleERC721BridgeBRCA} from "../src/mocks/SimpleERC721BridgeBRCA.sol";
 import {MockERC721} from "../src/mocks/MockERC721.sol";
 import {IERC721A} from "ERC721A/IERC721A.sol";
 
@@ -185,6 +185,7 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(nftA.originalTokenId(6), 0);
         assertEq(nftA.originalTokenId(7), 0);
         assertEq(nftA.originalTokenId(8), 0);
+
         assertEq(nftA.originalTokenId(9), 0);
 
         assertEq(nftA.tokenURI(1), "ar://predefine/3.json");
@@ -197,5 +198,19 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(nftA.tokenURI(8), "ar://predefine/0.json");
         vm.expectRevert("This token has not minted");
         nftA.tokenURI(9);
+    }
+
+    function testEmergencyWithdraw() public {
+        original.mint(bob, 3);
+        nftA.grantOperator(bob);
+
+        // deposit original nft
+        vm.prank(bob);
+        original.safeTransferFrom(bob, address(nftA), 3);
+        assertEq(original.ownerOf(3), address(nftA));
+
+        // emergency withdraw
+        nftA.emergencyWithdraw(alis, 3);
+        assertEq(original.ownerOf(3), alis);
     }
 }

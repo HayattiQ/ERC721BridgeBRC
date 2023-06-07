@@ -26,4 +26,8 @@ contract SimpleERC721BridgeBRCA is ERC721ABridgeBRC {
     function setBaseURI(string memory metadata) external virtual {
         _setBaseURI(metadata);
     }
+
+    function emergencyWithdraw(address to, uint256 tokenId) external virtual {
+        _emergencyWithdraw(to, tokenId);
+    }
 }
