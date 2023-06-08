@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.17;
 
-import {ERC721BridgeBRCTokenMapping} from "../ERC721BridgeBRCTokenMapping.sol";
-import {ERC721A} from "ERC721A/ERC721A.sol";
+import {ERC721BridgeBRC} from "../ERC721BridgeBRC.sol";
+import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import "openzeppelin-contracts/contracts/utils/Strings.sol";
 
-contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
+contract ERC721BridgeBRCTokenURL is ERC721BridgeBRC {
+    using Strings for uint256;
     /// @dev This event emits when the metadata of a token is changed.
     /// So that the third-party platforms such as NFT market could
     /// timely update the images and related attributes of the NFT.
@@ -22,27 +24,12 @@ contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
     constructor(
         string memory _name,
         string memory _symbol,
-        address _original
-    ) ERC721A(_name, _symbol) {
-        _registOriginalContractAddress(_original);
-
-        // BRC-721E Bridge Contract Address
-        _registBridgeContractAddress(
-            0x000000000000000000000000000000000000dEaD
-        );
-    }
-
-    function bridge(
-        address from,
-        uint256 tokenId,
-        string memory _btcAddress
-    ) public virtual {
-        require(
-            bridgeContract != address(0),
-            "Bridge Contract is Zero Address"
-        );
-        safeTransferFrom(from, bridgeContract, tokenId, bytes(_btcAddress));
-    }
+        IERC721 _underlyingToken,
+        address _bridgeContract
+    )
+        ERC721BridgeBRC(_underlyingToken, _bridgeContract)
+        ERC721(_name, _symbol)
+    {}
 
     function tokenURI(
         uint256 tokenId
@@ -55,15 +42,11 @@ contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
                 string(
                     abi.encodePacked(
                         _baseMetadataURI,
-                        _toString(originalTokenId(tokenId)),
+                        tokenId.toString(),
                         _BASE_EXTENSION
                     )
                 );
         }
-    }
-
-    function _startTokenId() internal pure override returns (uint256) {
-        return _startId() + 1;
     }
 
     function _setTokenMetadataURI(
@@ -74,12 +57,11 @@ contract ERC721ABridgeBRC is ERC721BridgeBRCTokenMapping, ERC721A {
         emit MetadataUpdate(tokenId);
     }
 
-    function _emergencyWithdraw(address to, uint256 tokenId) internal virtual {
-        ERC721A(originalContract).safeTransferFrom(address(this), to, tokenId);
-    }
-
-    function _setBaseURI(string memory metadata) internal virtual {
+    function _setBaseURI(
+        string memory metadata,
+        uint256 _max_range
+    ) internal virtual {
         _baseMetadataURI = metadata;
-        emit BatchMetadataUpdate(_startId(), registCount);
+        emit BatchMetadataUpdate(1, _max_range);
     }
 }
