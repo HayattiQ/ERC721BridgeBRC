@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.17;
 
-import {ERC721BridgeBRC} from "./ERC721BridgeBRC.sol";
+import {ERC721BridgeBRC, IERC721Receiver} from "./ERC721BridgeBRC.sol";
 
 contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
     mapping(uint256 => uint256) private originalNFTTokenId;
@@ -28,10 +28,12 @@ contract ERC721BridgeBRCTokenMapping is ERC721BridgeBRC {
         address operator,
         address from,
         uint256 tokenId,
-        bytes memory data
+        bytes memory
     ) public virtual override returns (bytes4) {
+        require(hasOperator(operator), "token transfer need operator role");
         registCount++;
         originalNFTTokenId[registCount] = tokenId;
-        return super.onERC721Received(operator, from, tokenId, data);
+        emit TokenReceived(operator, from, tokenId);
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

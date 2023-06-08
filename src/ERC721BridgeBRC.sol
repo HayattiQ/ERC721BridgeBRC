@@ -69,6 +69,6 @@ contract ERC721BridgeBRC is IERC721Receiver {
     ) public virtual override returns (bytes4) {
         require(hasOperator(operator), "token transfer need operator role");
         emit TokenReceived(operator, from, tokenId);
-        return this.onERC721Received.selector;
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
