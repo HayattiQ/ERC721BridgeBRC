@@ -45,8 +45,12 @@ abstract contract ERC721BridgeBRC is ERC721 {
         _underlying.transferFrom(address(this), to, tokenId);
     }
 
-    function depositedTokenIds() public view returns (uint256[] memory) {
+    function depositTokenIds() public view returns (uint256[] memory) {
         return _depositTokenId.values();
+    }
+
+    function depositLength() public view returns (uint256) {
+        return _depositTokenId.length();
     }
 
     function _mintAt(address _to) internal virtual {

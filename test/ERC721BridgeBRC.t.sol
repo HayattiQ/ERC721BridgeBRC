@@ -77,7 +77,7 @@ contract ERC721BridgeBRCTest is Test {
         values[1] = uint256(5);
         values[2] = uint256(19);
         values[3] = uint256(11);
-        assertEq(nft.depositedTokenIds(), values);
+        assertEq(nft.depositTokenIds(), values);
         _tokenIds.add(5);
         _tokenIds.add(7);
         _tokenIds.add(11);
@@ -87,7 +87,7 @@ contract ERC721BridgeBRCTest is Test {
         vm.recordLogs();
 
         // mint first
-        nft.depositedTokenIds();
+        nft.depositTokenIds();
         nft.mintAt(bob);
         Vm.Log[] memory entries = vm.getRecordedLogs();
         uint256 firstMintId = uint256(entries[0].topics[3]);
@@ -97,7 +97,7 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(_tokenIds.length(), 3);
 
         // mint second
-        nft.depositedTokenIds();
+        nft.depositTokenIds();
         nft.mintAt(bob);
         entries = vm.getRecordedLogs();
         uint256 secondMintId = uint256(entries[0].topics[3]);
@@ -107,7 +107,7 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(_tokenIds.length(), 2);
 
         // mint third
-        nft.depositedTokenIds();
+        nft.depositTokenIds();
         nft.mintAt(bob);
         entries = vm.getRecordedLogs();
         uint256 thirdMintId = uint256(entries[0].topics[3]);
@@ -117,7 +117,7 @@ contract ERC721BridgeBRCTest is Test {
         assertEq(_tokenIds.length(), 1);
 
         // mint forth
-        nft.depositedTokenIds();
+        nft.depositTokenIds();
         nft.mintAt(bob);
         entries = vm.getRecordedLogs();
         uint256 forthMintId = uint256(entries[0].topics[3]);
@@ -126,7 +126,7 @@ contract ERC721BridgeBRCTest is Test {
         _tokenIds.remove(forthMintId);
         assertEq(_tokenIds.length(), 0);
 
-        assertEq(nft.depositedTokenIds(), new uint256[](0));
+        assertEq(nft.depositTokenIds(), new uint256[](0));
         vm.expectRevert("No values in the set");
         nft.mintAt(bob);
 
