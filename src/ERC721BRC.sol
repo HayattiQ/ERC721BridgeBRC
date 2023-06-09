@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/structs/EnumerableSet.sol";
-import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 
-abstract contract ERC721BridgeBRC is ERC721 {
-    using EnumerableSet for EnumerableSet.UintSet;
-
-    EnumerableSet.UintSet private _depositTokenId;
+abstract contract ERC721BRC {
     IERC721 private immutable _underlying;
 
-    event TokenDeposit(address indexed from, uint256 tokenId, bool added);
+    event TokenDeposit(address indexed from, uint256 tokenId);
 
     address public bridgeContract;
     mapping(address => bool) private _operator;
@@ -22,14 +18,6 @@ abstract contract ERC721BridgeBRC is ERC721 {
 
     function _registBridgeContractAddress(address _contract) internal {
         bridgeContract = _contract;
-    }
-
-    function bridge(
-        address from,
-        uint256 tokenId,
-        string memory _btcAddress
-    ) public virtual {
-        safeTransferFrom(from, bridgeContract, tokenId, bytes(_btcAddress));
     }
 
     /**
@@ -45,22 +33,8 @@ abstract contract ERC721BridgeBRC is ERC721 {
         _underlying.transferFrom(address(this), to, tokenId);
     }
 
-    function depositTokenIds() public view returns (uint256[] memory) {
-        return _depositTokenId.values();
-    }
-
-    function depositLength() public view returns (uint256) {
-        return _depositTokenId.length();
-    }
-
-    function _mintAt(address _to) internal virtual {
-        require(_depositTokenId.length() > 0, "No values in the set");
-        uint256 _tokenId = _depositTokenId.at(0);
-        require(
-            _depositTokenId.remove(_tokenId),
-            "Failed to remove the value from the depositId"
-        );
-        _mint(_to, _tokenId);
+    function depositSupply() public view returns (uint256) {
+        return _underlying.balanceOf(address(this));
     }
 
     // This is an "unsafe" transfer that doesn't call any hook on the receiver. With underlying() being trusted
@@ -68,7 +42,6 @@ abstract contract ERC721BridgeBRC is ERC721 {
     // slither-disable-next-line reentrancy-no-eth
     function deposit(uint256 _tokenId) public virtual {
         _underlying.transferFrom(msg.sender, address(this), _tokenId);
-        bool added = _depositTokenId.add(_tokenId);
-        emit TokenDeposit(msg.sender, _tokenId, added);
+        emit TokenDeposit(msg.sender, _tokenId);
     }
 }
